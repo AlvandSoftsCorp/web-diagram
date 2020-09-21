@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Stdents Grades Diagram</title>
+    <script src="./Chart.js"></script>
+    <script src="./jquery-3.3.1.min.js"></script>
+
+</head>
+<body>
+    <h1 style="text-align:center;">
+        Students Diagram:
+    </h1>
+    <input type="button" id='btnGetDataFromServer' value="GET DATA FROM SERVER" style="height:35px;">    
+    <canvas id="cnvs_std_grades" style="height:500px; width:600px;"></canvas>
+
+<script>
+
+    var std_names = ["علی", "رضا", "سارا", "سینا", "امید", "نسرین"];
+    var std_grades = [20,15,18,12,19,9];
+
+    var ctx = null;
+    var myChart = null;
+
+    init_event_handlers = function()
+    {
+        $('#btnGetDataFromServer').on('click',function(){
+           $.post(
+               './srv.php',
+               {func:'get_data'},
+               function(d,s)
+               {
+                   alert(d.trim());
+                   var jsn = jQuery.parseJSON(d.trim());
+                   myChart.data.labels = jsn.names;
+                   myChart.data.datasets[0].data = jsn.grades;
+                   myChart.update();
+               }
+           );
+       }) 
+    }
+
+    init_chart=function()
+    {
+        ctx = document.getElementById("cnvs_std_grades").getContext('2d');
+        myChart = new Chart(ctx, {
+    type: 'line', /* line|bar|pie */
+    data: {
+        labels: std_names,
+        datasets: [{
+            label: 'نمودار نمرات',
+            data: std_grades,
+            backgroundColor: [
+                '#af0b0b',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive:false,
+        maintainAspectRatio: true,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        },
+        layout: {
+            padding: {
+                left: 50,
+                right: 50,
+                top: 20,
+                bottom: 20
+            }
+        }
+    }
+});
+    }
+
+    init = function()
+    {
+        init_event_handlers();
+        init_chart();
+    }
+
+    $(document).ready(init);
+
+</script>
+</body>
+</html>
